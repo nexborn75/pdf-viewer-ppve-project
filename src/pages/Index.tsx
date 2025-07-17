@@ -21,7 +21,9 @@ const Index = () => {
 
   const handleViewPdf = (filename: string, title: string) => {
     console.log('Navigation vers PDF:', filename);
-    navigate(`/pdf/${filename}`);
+    // Ouverture directe dans un nouvel onglet pour éviter les blocages
+    const pdfUrl = getPdfUrl(filename);
+    window.open(pdfUrl, '_blank');
   };
 
   const handleDownloadPdf = (filename: string, title: string) => {
