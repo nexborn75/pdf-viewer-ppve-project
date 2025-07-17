@@ -1,7 +1,7 @@
 import { PDFCard } from "@/components/PDFCard";
 import { PDFDiagnostic } from "@/components/PDFDiagnostic";
-import { ModernPDFViewer } from "@/components/ModernPDFViewer";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
+import { useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,17 +10,18 @@ import { FileText, FolderOpen, ChevronDown, ChevronRight, Folder, Settings } fro
 import { useState } from "react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isPPVEOpen, setIsPPVEOpen] = useState(false);
   const [isPermisOpen, setIsPermisOpen] = useState(false);
   const [showDiagnostic, setShowDiagnostic] = useState(false);
-  const [selectedPdf, setSelectedPdf] = useState<{ filename: string; title: string } | null>(null);
   
   const ppveDocuments = pdfDocuments.filter(doc => doc.category === 'ppve');
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
   const permisDocuments = pdfDocuments.filter(doc => doc.category === 'permis-amenager');
 
   const handleViewPdf = (filename: string, title: string) => {
-    setSelectedPdf({ filename, title });
+    console.log('Navigation vers PDF:', filename);
+    navigate(`/pdf/${filename}`);
   };
 
   const handleDownloadPdf = (filename: string, title: string) => {
@@ -190,16 +191,6 @@ const Index = () => {
               />
             ))}
         </div>
-
-        {/* Visionneuse PDF */}
-        {selectedPdf && (
-          <ModernPDFViewer
-            isOpen={!!selectedPdf}
-            onClose={() => setSelectedPdf(null)}
-            filename={selectedPdf.filename}
-            title={selectedPdf.title}
-          />
-        )}
       </div>
 
         {/* Footer */}
