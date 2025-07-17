@@ -20,7 +20,7 @@ import { getPdfUrl } from "@/data/pdfs";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configuration PDF.js simplifiée - pas de worker pour éviter les erreurs
+// Configuration PDF.js - Désactiver le worker pour éviter les erreurs CORS
 if (typeof window !== 'undefined') {
   pdfjs.GlobalWorkerOptions.workerSrc = '';
 }

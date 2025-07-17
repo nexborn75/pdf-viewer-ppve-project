@@ -25,9 +25,9 @@ import { getPdfUrl, pdfDocuments } from "@/data/pdfs";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configuration PDF.js
+// Configuration PDF.js - Désactiver le worker pour éviter les erreurs CORS
 if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+  pdfjs.GlobalWorkerOptions.workerSrc = '';
 }
 
 const SimplePDFViewer = () => {
