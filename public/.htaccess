@@ -8,7 +8,7 @@ RewriteEngine On
 # Redirect all requests to index.html except for existing files
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/PPVE/
+RewriteCond %{REQUEST_URI} !^/PDF/
 RewriteRule ^.*$ /index.html [L]
 
 # Set proper MIME types for static files

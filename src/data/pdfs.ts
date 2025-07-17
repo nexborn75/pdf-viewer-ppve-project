@@ -254,6 +254,6 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Tous les PDFs sont dans le dossier PPVE après déploiement IONOS
-  return `/PPVE/${filename}.pdf`;
+  // Tous les PDFs sont dans le dossier PDF après déploiement IONOS
+  return `/PDF/${filename}.pdf`;
 };
