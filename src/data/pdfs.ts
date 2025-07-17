@@ -254,13 +254,15 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Logique pour déterminer le bon dossier basé sur le filename
   const pdfDoc = pdfDocuments.find(doc => doc.filename === filename);
   
   if (pdfDoc?.category === 'ppve') {
     return `/PPVE/${filename}.pdf`;
+  } else if (pdfDoc?.category === 'permis-amenager') {
+    return `/PDF/${filename}.pdf`;
+  } else {
+    // Documents 'additional' - certains sont à la racine, d'autres dans PDF
+    // Teste d'abord la racine puis PDF
+    return `/${filename}.pdf`;
   }
-  
-  // Pour les autres catégories, tester d'abord PDF puis PPVE en fallback
-  return `/PDF/${filename}.pdf`;
 };
