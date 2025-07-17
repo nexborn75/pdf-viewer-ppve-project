@@ -11,7 +11,7 @@ npm run build
 echo "📄 Copie des fichiers PDF..."
 mkdir -p dist/PPVE
 cp -r public/PPVE/* dist/PPVE/
-cp public/*.pdf dist/ 2>/dev/null || true
+cp public/*.pdf dist/PPVE/ 2>/dev/null || true
 
 # Copier le fichier .htaccess
 echo "⚙️ Configuration serveur..."
