@@ -1,7 +1,6 @@
 import { PDFCard } from "@/components/PDFCard";
 import { PDFDiagnostic } from "@/components/PDFDiagnostic";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
-import { openPdfWithFallback, downloadPdfWithFallback } from "@/utils/pdfUtils";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,14 +17,19 @@ const Index = () => {
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
   const permisDocuments = pdfDocuments.filter(doc => doc.category === 'permis-amenager');
 
-  const handleViewPdf = async (filename: string, title: string) => {
-    console.log('Tentative d\'ouverture du PDF:', filename);
-    await openPdfWithFallback(filename, title);
+  const handleViewPdf = (filename: string, title: string) => {
+    const pdfUrl = getPdfUrl(filename);
+    console.log('Ouverture du PDF:', pdfUrl);
+    window.open(pdfUrl, '_blank');
   };
 
-  const handleDownloadPdf = async (filename: string, title: string) => {
-    console.log('Tentative de téléchargement du PDF:', filename);
-    await downloadPdfWithFallback(filename, title);
+  const handleDownloadPdf = (filename: string, title: string) => {
+    const link = document.createElement('a');
+    link.href = getPdfUrl(filename);
+    link.download = `${title}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
