@@ -1,5 +1,6 @@
 import { PDFCard } from "@/components/PDFCard";
 import { PDFDiagnostic } from "@/components/PDFDiagnostic";
+import { ModernPDFViewer } from "@/components/ModernPDFViewer";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -12,15 +13,14 @@ const Index = () => {
   const [isPPVEOpen, setIsPPVEOpen] = useState(false);
   const [isPermisOpen, setIsPermisOpen] = useState(false);
   const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState<{ filename: string; title: string } | null>(null);
   
   const ppveDocuments = pdfDocuments.filter(doc => doc.category === 'ppve');
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
   const permisDocuments = pdfDocuments.filter(doc => doc.category === 'permis-amenager');
 
   const handleViewPdf = (filename: string, title: string) => {
-    const pdfUrl = getPdfUrl(filename);
-    console.log('Ouverture du PDF:', pdfUrl);
-    window.open(pdfUrl, '_blank');
+    setSelectedPdf({ filename, title });
   };
 
   const handleDownloadPdf = (filename: string, title: string) => {
@@ -189,8 +189,18 @@ const Index = () => {
                 onDownload={() => handleDownloadPdf(doc.filename, doc.title)}
               />
             ))}
-          </div>
         </div>
+
+        {/* Visionneuse PDF */}
+        {selectedPdf && (
+          <ModernPDFViewer
+            isOpen={!!selectedPdf}
+            onClose={() => setSelectedPdf(null)}
+            filename={selectedPdf.filename}
+            title={selectedPdf.title}
+          />
+        )}
+      </div>
 
         {/* Footer */}
         <div className="mt-16 text-center text-muted-foreground text-sm">
