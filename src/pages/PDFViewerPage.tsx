@@ -21,18 +21,14 @@ import { getPdfUrl, pdfDocuments } from "@/data/pdfs";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configuration PDF.js optimisée pour Lovable
-if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-  // Essayer plusieurs CDN pour maximiser la compatibilité
-  const workerSources = [
-    `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`,
-    `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`,
-    '/pdfjs/pdf.worker.min.js' // fallback local si disponible
-  ];
-  
-  pdfjs.GlobalWorkerOptions.workerSrc = workerSources[0];
-  console.log('Configuration PDF.js worker:', pdfjs.GlobalWorkerOptions.workerSrc);
+// Configuration PDF.js simplifiée - pas de worker pour éviter les erreurs
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = '';
+  // @ts-ignore - Forcer la désactivation du worker
+  (pdfjs as any).disableWorker = true;
 }
+
+console.log('PDF.js configuré sans worker pour la compatibilité Lovable');
 
 const PDFViewerPage = () => {
   const { filename } = useParams<{ filename: string }>();
