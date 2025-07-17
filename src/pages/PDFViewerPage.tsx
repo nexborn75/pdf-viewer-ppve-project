@@ -21,8 +21,18 @@ import { getPdfUrl, pdfDocuments } from "@/data/pdfs";
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configuration PDF.js
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Configuration PDF.js optimisée pour Lovable
+if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+  // Essayer plusieurs CDN pour maximiser la compatibilité
+  const workerSources = [
+    `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`,
+    `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`,
+    '/pdfjs/pdf.worker.min.js' // fallback local si disponible
+  ];
+  
+  pdfjs.GlobalWorkerOptions.workerSrc = workerSources[0];
+  console.log('Configuration PDF.js worker:', pdfjs.GlobalWorkerOptions.workerSrc);
+}
 
 const PDFViewerPage = () => {
   const { filename } = useParams<{ filename: string }>();
@@ -61,7 +71,16 @@ const PDFViewerPage = () => {
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('Erreur de chargement du PDF:', error);
     setIsLoading(false);
-    setLoadError(`Erreur de chargement: ${error.message}`);
+    
+    // Message d'erreur plus descriptif
+    let errorMsg = error.message;
+    if (error.message.includes('worker')) {
+      errorMsg = 'Erreur de configuration PDF.js. Vérifiez votre connexion internet.';
+    } else if (error.message.includes('fetch')) {
+      errorMsg = 'Fichier PDF introuvable. Vérifiez que le fichier existe.';
+    }
+    
+    setLoadError(errorMsg);
   }, []);
 
   const goToPrevPage = () => {
@@ -238,13 +257,30 @@ const PDFViewerPage = () => {
                   <div className="text-red-500 text-6xl mb-4">⚠️</div>
                   <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
                   <p className="text-muted-foreground mb-4">{loadError}</p>
-                  <p className="text-sm text-muted-foreground">URL tentée: {pdfUrl}</p>
-                  <Button 
-                    onClick={() => window.location.reload()} 
-                    className="mt-4"
-                  >
-                    Réessayer
-                  </Button>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <p>URL tentée: {pdfUrl}</p>
+                    <p>Worker PDF.js: {pdfjs.GlobalWorkerOptions.workerSrc}</p>
+                  </div>
+                  <div className="flex gap-2 mt-4 justify-center">
+                    <Button 
+                      onClick={() => {
+                        setLoadError('');
+                        setIsLoading(true);
+                        // Forcer le rechargement
+                        window.location.reload();
+                      }} 
+                      size="sm"
+                    >
+                      Réessayer
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(pdfUrl, '_blank')}
+                    >
+                      Ouvrir directement
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
