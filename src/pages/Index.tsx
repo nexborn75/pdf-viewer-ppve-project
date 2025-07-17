@@ -9,8 +9,11 @@ const Index = () => {
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
 
   const handleViewPdf = (filename: string, title: string) => {
+    const pdfUrl = getPdfUrl(filename);
+    console.log('Tentative d\'ouverture du PDF:', pdfUrl);
+    console.log('URL complète:', window.location.origin + pdfUrl);
     // Ouvre directement le PDF en plein écran dans un nouvel onglet
-    window.open(getPdfUrl(filename), '_blank');
+    window.open(pdfUrl, '_blank');
   };
 
   const handleDownloadPdf = (filename: string, title: string) => {
