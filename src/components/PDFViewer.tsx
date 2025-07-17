@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Download, ExternalLink } from "lucide-react";
+import { X, Download, ExternalLink, Maximize2 } from "lucide-react";
 
 interface PDFViewerProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ export const PDFViewer = ({ isOpen, onClose, pdfUrl, title }: PDFViewerProps) =>
   const handleDownload = () => {
     const link = document.createElement('a');
     link.href = pdfUrl;
-    link.download = title;
+    link.download = `${title}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -35,20 +35,20 @@ export const PDFViewer = ({ isOpen, onClose, pdfUrl, title }: PDFViewerProps) =>
               <Button
                 variant="outline"
                 size="sm"
+                onClick={handleOpenExternal}
+                className="gap-2"
+              >
+                <Maximize2 className="w-4 h-4" />
+                Plein écran
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleDownload}
                 className="gap-2"
               >
                 <Download className="w-4 h-4" />
                 Télécharger
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleOpenExternal}
-                className="gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Ouvrir
               </Button>
               <Button
                 variant="ghost"
@@ -62,11 +62,28 @@ export const PDFViewer = ({ isOpen, onClose, pdfUrl, title }: PDFViewerProps) =>
           </div>
         </DialogHeader>
         <div className="flex-1 p-4">
-          <iframe
-            src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
-            className="w-full h-full border border-border rounded-lg bg-muted"
+          <object
+            data={pdfUrl}
+            type="application/pdf"
+            className="w-full h-full border border-border rounded-lg"
             title={title}
-          />
+          >
+            <div className="flex flex-col items-center justify-center h-full bg-muted rounded-lg p-8 text-center">
+              <p className="text-lg font-medium mb-4">
+                Impossible d'afficher le PDF dans le navigateur
+              </p>
+              <div className="space-x-4">
+                <Button onClick={handleOpenExternal} className="gap-2">
+                  <ExternalLink className="w-4 h-4" />
+                  Ouvrir dans un nouvel onglet
+                </Button>
+                <Button onClick={handleDownload} variant="outline" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Télécharger
+                </Button>
+              </div>
+            </div>
+          </object>
         </div>
       </DialogContent>
     </Dialog>

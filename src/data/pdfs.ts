@@ -113,7 +113,6 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // For now, we'll use placeholder URLs. In a real application, 
-  // you would replace this with the actual path to your PDF files
+  // Correct path to PDF files in public folder
   return `/PPVE/${filename}.pdf`;
 };

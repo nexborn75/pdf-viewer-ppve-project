@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PDFCard } from "@/components/PDFCard";
-import { SimplePDFViewer } from "@/components/SimplePDFViewer";
+import { PDFViewer } from "@/components/PDFViewer";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -134,9 +134,9 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Simple PDF Viewer Modal */}
+      {/* PDF Viewer Modal */}
       {selectedPdf && (
-        <SimplePDFViewer
+        <PDFViewer
           isOpen={!!selectedPdf}
           onClose={closePdfViewer}
           pdfUrl={selectedPdf.url}
