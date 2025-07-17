@@ -18,7 +18,7 @@ export const PDFCard = ({ title, filename, onView }: PDFCardProps) => {
               <FileText className="w-6 h-6 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-card-foreground group-hover:text-document-hover transition-colors mb-1">
+              <h3 className="font-semibold text-card-foreground group-hover:text-document-hover transition-colors mb-1 line-clamp-2 leading-tight">
                 {title}
               </h3>
               <p className="text-sm text-muted-foreground truncate">

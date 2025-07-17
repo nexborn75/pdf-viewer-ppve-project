@@ -15,7 +15,7 @@ export const pdfDocuments: PDFDocument[] = [
   },
   {
     id: 'conseil-essonne',
-    title: 'Conseil départemental de l\'Essonne',
+    title: 'Conseil départemental Essonne',
     filename: 'Conseil_departemental_de_Essonne',
     category: 'ppve'
   },
@@ -33,13 +33,13 @@ export const pdfDocuments: PDFDocument[] = [
   },
   {
     id: 'eau-coeur-plan',
-    title: 'Eau Coeur d\'Essonne Plan',
+    title: 'Eau Coeur Essonne - Plan',
     filename: 'Eau_Coeur_Essonne_Plan',
     category: 'ppve'
   },
   {
     id: 'eau-coeur',
-    title: 'Eau Coeur d\'Essonne',
+    title: 'Eau Coeur Essonne',
     filename: 'Eau_Coeur_Essonne',
     category: 'ppve'
   },
@@ -94,19 +94,19 @@ export const pdfDocuments: PDFDocument[] = [
   // Documents supplémentaires
   {
     id: 'dossier-permis',
-    title: 'Dossier de demande de permis d\'aménager (étude d\'impact incluse)',
+    title: 'Dossier permis d\'aménager',
     filename: 'Dossier_permis_amenager_etude_impact',
     category: 'additional'
   },
   {
     id: 'avis-mrae',
-    title: 'Avis de l\'autorité environnementale (MRAE)',
+    title: 'Avis autorité environnementale',
     filename: 'Avis_autorite_environnementale_MRAE',
     category: 'additional'
   },
   {
     id: 'reponse-mrae',
-    title: 'Réponse à l\'autorité environnementale (MRAE)',
+    title: 'Réponse autorité environnementale',
     filename: 'Reponse_autorite_environnementale_MRAE',
     category: 'additional'
   }
