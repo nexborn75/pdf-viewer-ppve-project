@@ -1,29 +1,16 @@
-import { useState } from "react";
 import { PDFCard } from "@/components/PDFCard";
-import { PDFViewer } from "@/components/PDFViewer";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { FileText, FolderOpen } from "lucide-react";
 
 const Index = () => {
-  const [selectedPdf, setSelectedPdf] = useState<{
-    url: string;
-    title: string;
-  } | null>(null);
-
   const ppveDocuments = pdfDocuments.filter(doc => doc.category === 'ppve');
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
 
   const handleViewPdf = (filename: string, title: string) => {
-    setSelectedPdf({
-      url: getPdfUrl(filename),
-      title
-    });
-  };
-
-  const closePdfViewer = () => {
-    setSelectedPdf(null);
+    // Ouvre directement le PDF en plein écran dans un nouvel onglet
+    window.open(getPdfUrl(filename), '_blank');
   };
 
   const handleDownloadPdf = (filename: string, title: string) => {
@@ -129,20 +116,10 @@ const Index = () => {
         {/* Footer */}
         <div className="mt-16 text-center text-muted-foreground text-sm">
           <p>
-            Cliquez sur "Consulter" pour ouvrir un document ou sur l'icône de téléchargement pour le sauvegarder
+            Cliquez sur "Consulter" pour ouvrir le PDF en plein écran ou sur l'icône de téléchargement pour le sauvegarder
           </p>
         </div>
       </div>
-
-      {/* PDF Viewer Modal */}
-      {selectedPdf && (
-        <PDFViewer
-          isOpen={!!selectedPdf}
-          onClose={closePdfViewer}
-          pdfUrl={selectedPdf.url}
-          title={selectedPdf.title}
-        />
-      )}
     </div>
   );
 };
