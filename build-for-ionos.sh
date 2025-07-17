@@ -7,11 +7,21 @@ echo "🚀 Build pour déploiement IONOS..."
 echo "📦 Build de l'application..."
 npm run build
 
-# Créer le dossier PPVE dans dist et copier les PDFs
+# Créer le dossier PPVE dans dist et copier TOUS les PDFs
 echo "📄 Copie des fichiers PDF..."
 mkdir -p dist/PPVE
-cp -r public/PPVE/* dist/PPVE/
-cp public/*.pdf dist/PPVE/ 2>/dev/null || true
+
+# Copier tous les PDFs du dossier PPVE
+if [ -d "public/PPVE" ]; then
+  cp -r public/PPVE/* dist/PPVE/
+  echo "✓ PDFs du dossier PPVE copiés"
+fi
+
+# Copier les PDFs de la racine vers PPVE (s'il y en a)
+if ls public/*.pdf 1> /dev/null 2>&1; then
+  cp public/*.pdf dist/PPVE/ 2>/dev/null || true
+  echo "✓ PDFs de la racine copiés vers PPVE"
+fi
 
 # Copier le fichier .htaccess
 echo "⚙️ Configuration serveur..."

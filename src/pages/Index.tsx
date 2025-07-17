@@ -1,14 +1,17 @@
 import { PDFCard } from "@/components/PDFCard";
+import { PDFDiagnostic } from "@/components/PDFDiagnostic";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FileText, FolderOpen, ChevronDown, ChevronRight, Folder } from "lucide-react";
+import { FileText, FolderOpen, ChevronDown, ChevronRight, Folder, Settings } from "lucide-react";
 import { useState } from "react";
 
 const Index = () => {
   const [isPPVEOpen, setIsPPVEOpen] = useState(false);
   const [isPermisOpen, setIsPermisOpen] = useState(false);
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
   
   const ppveDocuments = pdfDocuments.filter(doc => doc.category === 'ppve');
   const additionalDocuments = pdfDocuments.filter(doc => doc.category === 'additional');
@@ -51,11 +54,28 @@ const Index = () => {
             <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground">
               {pdfDocuments.length} documents disponibles
             </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDiagnostic(!showDiagnostic)}
+              className="bg-primary-foreground/10 text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/20"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {showDiagnostic ? 'Masquer diagnostic' : 'Diagnostic PDFs'}
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
+        {/* Diagnostic des PDFs */}
+        {showDiagnostic && (
+          <div className="mb-8">
+            <PDFDiagnostic />
+            <Separator className="mt-8" />
+          </div>
+        )}
+
         {/* Section PPVE - Collapsible */}
         <div className="mb-12">
           <Collapsible open={isPPVEOpen} onOpenChange={setIsPPVEOpen}>
