@@ -23,29 +23,10 @@ const SimplePDFViewer = () => {
   const title = pdfDoc?.title || filename || 'Document PDF';
   const pdfUrl = filename ? getPdfUrl(filename) : '';
 
-  // Utiliser l'URL directe du PDF avec des paramètres d'affichage
-  const directPdfUrl = `${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH`;
-
   useEffect(() => {
-    // Test de connectivité et initialisation
-    const testPdf = async () => {
-      try {
-        const response = await fetch(pdfUrl, { method: 'HEAD' });
-        if (response.ok) {
-          setIsLoading(false);
-        } else {
-          setHasError(true);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Erreur PDF:', error);
-        setHasError(true);
-        setIsLoading(false);
-      }
-    };
-
+    // Redirection automatique vers le PDF en plein écran
     if (pdfUrl) {
-      testPdf();
+      window.location.href = pdfUrl;
     }
   }, [pdfUrl]);
 
@@ -59,17 +40,8 @@ const SimplePDFViewer = () => {
     document.body.removeChild(link);
   };
 
-  const handleNewTab = () => {
-    window.open(directPdfUrl, '_blank');
-  };
-
-  const handleEmbed = () => {
-    window.open(directPdfUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-  };
-
-  const handleError = () => {
-    setHasError(true);
-    setIsLoading(false);
+  const handleDirectView = () => {
+    window.open(pdfUrl, '_blank');
   };
 
   if (!filename) {
@@ -85,146 +57,38 @@ const SimplePDFViewer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* En-tête fixe */}
-      <header className="bg-background border-b sticky top-0 z-50">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/')}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold truncate max-w-md">{title}</h1>
-              <Badge variant="outline">{filename}.pdf</Badge>
-            </div>
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center max-w-2xl p-8">
+        <div className="mb-6">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ExternalLink className="w-12 h-12 text-primary" />
           </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNewTab}
-              className="gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Nouvelle fenêtre
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleEmbed}
-              className="gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Popup
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Télécharger
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/')}
-              className="gap-2"
-            >
-              <Home className="h-4 w-4" />
-              Accueil
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold mb-2">{title}</h1>
+          <Badge variant="outline" className="mb-4">{filename}.pdf</Badge>
+          <p className="text-muted-foreground mb-6">
+            Redirection vers l'affichage PDF en cours...
+          </p>
         </div>
-      </header>
 
-      {/* Contenu principal */}
-      <div className="flex-1 relative">
-        {/* Indicateur de chargement */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground mb-4">Initialisation du viewer PDF...</p>
-              <p className="text-sm text-muted-foreground">PDF.js • {filename}.pdf</p>
-            </div>
-          </div>
-        )}
+        <div className="flex gap-3 justify-center flex-wrap">
+          <Button onClick={handleDirectView} size="lg" className="gap-2">
+            <ExternalLink className="h-5 w-5" />
+            Ouvrir le PDF
+          </Button>
+          <Button onClick={handleDownload} variant="outline" size="lg" className="gap-2">
+            <Download className="h-5 w-5" />
+            Télécharger
+          </Button>
+          <Button onClick={() => navigate('/')} variant="outline" size="lg" className="gap-2">
+            <ArrowLeft className="h-5 w-5" />
+            Retour accueil
+          </Button>
+        </div>
 
-        {/* Erreur de chargement */}
-        {hasError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background z-10 p-4">
-            <div className="text-center max-w-2xl">
-              <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
-              <p className="text-muted-foreground mb-6">
-                Impossible de charger le viewer PDF
-              </p>
-              
-              <div className="flex gap-2 justify-center flex-wrap">
-                <Button 
-                  onClick={handleNewTab}
-                  className="gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Ouvrir en nouvelle fenêtre
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={handleEmbed}
-                  className="gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Ouvrir en popup
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={handleDownload}
-                  className="gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Télécharger le PDF
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate('/')}
-                  className="gap-2"
-                >
-                  <Home className="h-4 w-4" />
-                  Retour accueil
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Affichage PDF direct avec embed/object */}
-        {!hasError && !isLoading && (
-          <div className="w-full h-full" style={{ minHeight: 'calc(100vh - 80px)' }}>
-            <object
-              data={directPdfUrl}
-              type="application/pdf"
-              className="w-full h-full"
-              onError={handleError}
-            >
-              <embed
-                src={directPdfUrl}
-                type="application/pdf"
-                className="w-full h-full"
-                onError={handleError}
-              />
-            </object>
-          </div>
-        )}
+        <div className="mt-8 text-sm text-muted-foreground">
+          <p>Le PDF s'ouvre automatiquement dans votre navigateur.</p>
+          <p>Si cela ne fonctionne pas, cliquez sur "Ouvrir le PDF" ci-dessus.</p>
+        </div>
       </div>
     </div>
   );
