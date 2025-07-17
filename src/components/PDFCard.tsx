@@ -19,12 +19,9 @@ export const PDFCard = ({ title, filename, onView, onDownload }: PDFCardProps) =
               <FileText className="w-6 h-6 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-card-foreground group-hover:text-document-hover transition-colors mb-1 line-clamp-2 leading-tight">
+              <h3 className="font-semibold text-card-foreground group-hover:text-document-hover transition-colors mb-3 line-clamp-2 leading-tight">
                 {title}
               </h3>
-              <p className="text-sm text-muted-foreground truncate mb-3">
-                {filename}.pdf
-              </p>
               <div className="flex gap-2">
                 <Button
                   onClick={onView}
