@@ -261,6 +261,6 @@ export const getPdfUrl = (filename: string): string => {
     return `/PPVE/${filename}.pdf`;
   }
   
-  // Par défaut, chercher dans PDF
+  // Pour les autres catégories, tester d'abord PDF puis PPVE en fallback
   return `/PDF/${filename}.pdf`;
 };
