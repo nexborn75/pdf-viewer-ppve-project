@@ -113,6 +113,6 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Correct path to PDF files in public folder
-  return `/PPVE/${filename}.pdf`;
+  // Fichiers PDF directement dans le dossier public
+  return `/${filename}.pdf`;
 };
