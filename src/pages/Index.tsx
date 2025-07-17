@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PDFCard } from "@/components/PDFCard";
-import { PDFViewer } from "@/components/PDFViewer";
+import { SimplePDFViewer } from "@/components/SimplePDFViewer";
 import { pdfDocuments, getPdfUrl } from "@/data/pdfs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,15 @@ const Index = () => {
 
   const closePdfViewer = () => {
     setSelectedPdf(null);
+  };
+
+  const handleDownloadPdf = (filename: string, title: string) => {
+    const link = document.createElement('a');
+    link.href = getPdfUrl(filename);
+    link.download = `${title}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -77,6 +86,7 @@ const Index = () => {
                 title={doc.title}
                 filename={doc.filename}
                 onView={() => handleViewPdf(doc.filename, doc.title)}
+                onDownload={() => handleDownloadPdf(doc.filename, doc.title)}
               />
             ))}
           </div>
@@ -110,6 +120,7 @@ const Index = () => {
                 title={doc.title}
                 filename={doc.filename}
                 onView={() => handleViewPdf(doc.filename, doc.title)}
+                onDownload={() => handleDownloadPdf(doc.filename, doc.title)}
               />
             ))}
           </div>
@@ -118,14 +129,14 @@ const Index = () => {
         {/* Footer */}
         <div className="mt-16 text-center text-muted-foreground text-sm">
           <p>
-            Cliquez sur un document pour l'ouvrir dans la visionneuse intégrée
+            Cliquez sur "Consulter" pour ouvrir un document ou sur l'icône de téléchargement pour le sauvegarder
           </p>
         </div>
       </div>
 
-      {/* PDF Viewer Modal */}
+      {/* Simple PDF Viewer Modal */}
       {selectedPdf && (
-        <PDFViewer
+        <SimplePDFViewer
           isOpen={!!selectedPdf}
           onClose={closePdfViewer}
           pdfUrl={selectedPdf.url}
