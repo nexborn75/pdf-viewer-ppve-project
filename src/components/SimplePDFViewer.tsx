@@ -23,17 +23,31 @@ const SimplePDFViewer = () => {
   const title = pdfDoc?.title || filename || 'Document PDF';
   const pdfUrl = filename ? getPdfUrl(filename) : '';
 
-  // Créer l'URL du viewer PDF.js hébergé par Mozilla
-  const pdfViewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+  // Utiliser l'URL directe du PDF avec des paramètres d'affichage
+  const directPdfUrl = `${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH`;
 
   useEffect(() => {
-    // Simuler un chargement court
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    // Test de connectivité et initialisation
+    const testPdf = async () => {
+      try {
+        const response = await fetch(pdfUrl, { method: 'HEAD' });
+        if (response.ok) {
+          setIsLoading(false);
+        } else {
+          setHasError(true);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Erreur PDF:', error);
+        setHasError(true);
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    if (pdfUrl) {
+      testPdf();
+    }
+  }, [pdfUrl]);
 
   const handleDownload = () => {
     if (!filename) return;
@@ -46,7 +60,11 @@ const SimplePDFViewer = () => {
   };
 
   const handleNewTab = () => {
-    window.open(pdfViewerUrl, '_blank');
+    window.open(directPdfUrl, '_blank');
+  };
+
+  const handleEmbed = () => {
+    window.open(directPdfUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
   };
 
   const handleError = () => {
@@ -96,7 +114,16 @@ const SimplePDFViewer = () => {
               className="gap-2"
             >
               <ExternalLink className="h-4 w-4" />
-              Plein écran
+              Nouvelle fenêtre
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleEmbed}
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Popup
             </Button>
             <Button
               variant="outline"
@@ -149,7 +176,15 @@ const SimplePDFViewer = () => {
                   className="gap-2"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Ouvrir en plein écran
+                  Ouvrir en nouvelle fenêtre
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleEmbed}
+                  className="gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Ouvrir en popup
                 </Button>
                 <Button 
                   variant="outline"
@@ -172,16 +207,23 @@ const SimplePDFViewer = () => {
           </div>
         )}
 
-        {/* Viewer PDF.js dans iframe */}
+        {/* Affichage PDF direct avec embed/object */}
         {!hasError && !isLoading && (
-          <iframe
-            src={pdfViewerUrl}
-            className="w-full h-full border-0"
-            title={title}
-            onError={handleError}
-            style={{ minHeight: 'calc(100vh - 80px)' }}
-            allow="fullscreen"
-          />
+          <div className="w-full h-full" style={{ minHeight: 'calc(100vh - 80px)' }}>
+            <object
+              data={directPdfUrl}
+              type="application/pdf"
+              className="w-full h-full"
+              onError={handleError}
+            >
+              <embed
+                src={directPdfUrl}
+                type="application/pdf"
+                className="w-full h-full"
+                onError={handleError}
+              />
+            </object>
+          </div>
         )}
       </div>
     </div>
