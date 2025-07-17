@@ -1,3 +1,4 @@
+
 export interface PDFDocument {
   id: string;
   title: string;
@@ -113,6 +114,6 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Fichiers PDF directement dans le dossier public
-  return `/${filename}.pdf`;
+  // Les fichiers PDF sont dans le dossier public/PPVE/
+  return `/PPVE/${filename}.pdf`;
 };
