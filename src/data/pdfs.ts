@@ -254,6 +254,12 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Les fichiers PDF sont dans le dossier public/PPVE/
-  return `/PPVE/${filename}.pdf`;
+  // Handle different categories with proper paths for IONOS deployment
+  if (filename.includes('PA') || filename.includes('00-') || 
+      filename.includes('RTE') || filename.includes('SDIS') || filename.includes('Reponse') ||
+      filename.includes('Avis') || filename.includes('Dossier') || filename.includes('Eau')) {
+    return `/PPVE/${filename}.pdf`;
+  }
+  // For additional documents in root (CDEA, DGAC, etc.)
+  return `/${filename}.pdf`;
 };
