@@ -30,7 +30,7 @@ interface PDFViewerProps {
   title: string;
 }
 
-export const PDFViewer = ({ isOpen, onClose, filename, title }: PDFViewerProps) => {
+export const ModernPDFViewer = ({ isOpen, onClose, filename, title }: PDFViewerProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -221,5 +221,3 @@ export const PDFViewer = ({ isOpen, onClose, filename, title }: PDFViewerProps) 
     </Dialog>
   );
 };
-
-export { PDFViewer as ModernPDFViewer };
