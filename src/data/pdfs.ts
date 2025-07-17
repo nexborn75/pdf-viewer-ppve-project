@@ -254,6 +254,13 @@ export const pdfDocuments: PDFDocument[] = [
 ];
 
 export const getPdfUrl = (filename: string): string => {
-  // Adaptation temporaire : teste PDF puis PPVE si nécessaire
+  // Logique pour déterminer le bon dossier basé sur le filename
+  const pdfDoc = pdfDocuments.find(doc => doc.filename === filename);
+  
+  if (pdfDoc?.category === 'ppve') {
+    return `/PPVE/${filename}.pdf`;
+  }
+  
+  // Par défaut, chercher dans PDF
   return `/PDF/${filename}.pdf`;
 };
