@@ -21,6 +21,8 @@ const SimplePDFViewer = () => {
   const [hasError, setHasError] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string>('');
   const [debugInfo, setDebugInfo] = useState<any>({});
+  const [pdfSupported, setPdfSupported] = useState(false);
+  const [objectError, setObjectError] = useState(false);
 
   // Trouver le document correspondant
   const pdfDoc = pdfDocuments.find(doc => doc.filename === filename);
@@ -37,13 +39,26 @@ const SimplePDFViewer = () => {
       console.log('User Agent:', navigator.userAgent);
       console.log('Location:', window.location.href);
       
+      // Détecter le support PDF natif
+      const pdfMimeSupported = navigator.mimeTypes['application/pdf'];
+      const pdfPluginSupported = Array.from(navigator.plugins).some(plugin => 
+        plugin.name.toLowerCase().includes('pdf')
+      );
+      const browserSupport = pdfMimeSupported || pdfPluginSupported;
+      setPdfSupported(browserSupport);
+      
       const debug: any = {
         filename,
         pdfDoc,
         pdfUrl,
         userAgent: navigator.userAgent,
         location: window.location.href,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        pdfSupport: {
+          mimeSupported: !!pdfMimeSupported,
+          pluginSupported: pdfPluginSupported,
+          browserSupport
+        }
       };
       
       setDebugInfo(debug);
@@ -88,13 +103,27 @@ const SimplePDFViewer = () => {
     console.log('PDF chargé avec succès');
     setIsLoading(false);
     setHasError(false);
+    setObjectError(false);
   };
 
   const handleError = (event: any) => {
-    console.error('Erreur iframe:', event);
+    console.error('Erreur de visualisation PDF:', event);
     setIsLoading(false);
-    setHasError(true);
-    setErrorDetails('Impossible de charger le PDF dans l\'iframe');
+    
+    if (!objectError) {
+      // Premier échec avec <object>, essayer <embed>
+      console.log('Tentative avec embed...');
+      setObjectError(true);
+    } else {
+      // Échec complet
+      setHasError(true);
+      setErrorDetails('Impossible de charger le PDF (ERR_BLOCKED_BY_CLIENT détecté)');
+    }
+  };
+
+  const handleDirectDownload = () => {
+    console.log('Redirection vers téléchargement direct');
+    window.location.href = pdfUrl;
   };
 
   const testDirectAccess = () => {
@@ -247,17 +276,46 @@ const SimplePDFViewer = () => {
           </div>
         )}
 
-        {/* Visionneuse PDF avec iframe */}
+        {/* Visionneuse PDF multi-méthode */}
         {!hasError && (
-          <iframe
-            src={`${pdfUrl}#view=FitH`}
-            className="w-full h-full border-0"
-            title={title}
-            onLoad={handleLoad}
-            onError={handleError}
-            style={{ minHeight: 'calc(100vh - 80px)' }}
-            allow="autoplay"
-          />
+          <div className="w-full h-full" style={{ minHeight: 'calc(100vh - 80px)' }}>
+            {!objectError ? (
+              // Méthode 1: Object tag (plus compatible)
+              <object
+                data={`${pdfUrl}#view=FitH`}
+                type="application/pdf"
+                className="w-full h-full"
+                onLoad={handleLoad}
+                onError={handleError}
+              >
+                {/* Fallback si object ne fonctionne pas */}
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <p className="mb-4">Votre navigateur ne supporte pas l'affichage PDF intégré</p>
+                    <div className="space-x-2">
+                      <Button onClick={handleDirectDownload}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Télécharger le PDF
+                      </Button>
+                      <Button variant="outline" onClick={testDirectAccess}>
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Ouvrir dans un nouvel onglet
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </object>
+            ) : (
+              // Méthode 2: Embed tag (fallback)
+              <embed
+                src={`${pdfUrl}#view=FitH`}
+                type="application/pdf"
+                className="w-full h-full"
+                onLoad={handleLoad}
+                onError={handleError}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>
