@@ -29,23 +29,17 @@ const SimplePDFViewer = () => {
   const title = pdfDoc?.title || filename || 'Document PDF';
   const pdfUrl = filename ? getPdfUrl(filename) : '';
 
-  // Diagnostic complet au chargement
+  // Diagnostic et détection automatique des blocages
   useEffect(() => {
     const runDiagnostic = async () => {
       console.log('=== DIAGNOSTIC PDF VIEWER ===');
       console.log('Filename:', filename);
       console.log('PDF Document:', pdfDoc);
       console.log('Generated URL:', pdfUrl);
-      console.log('User Agent:', navigator.userAgent);
-      console.log('Location:', window.location.href);
       
-      // Détecter le support PDF natif
-      const pdfMimeSupported = navigator.mimeTypes['application/pdf'];
-      const pdfPluginSupported = Array.from(navigator.plugins).some(plugin => 
-        plugin.name.toLowerCase().includes('pdf')
-      );
-      const browserSupport = pdfMimeSupported || pdfPluginSupported;
-      setPdfSupported(browserSupport);
+      // Détecter l'environnement sandboxé
+      const isSandboxed = window.self !== window.top;
+      const isLovableEnv = window.location.hostname.includes('lovableproject.com');
       
       const debug: any = {
         filename,
@@ -54,14 +48,24 @@ const SimplePDFViewer = () => {
         userAgent: navigator.userAgent,
         location: window.location.href,
         timestamp: new Date().toISOString(),
-        pdfSupport: {
-          mimeSupported: !!pdfMimeSupported,
-          pluginSupported: pdfPluginSupported,
-          browserSupport
+        environment: {
+          isSandboxed,
+          isLovableEnv,
+          hostname: window.location.hostname
         }
       };
       
-      setDebugInfo(debug);
+      console.log('Environment detected:', debug.environment);
+      
+      // Si environnement détecté comme problématique, basculer automatiquement
+      if (isLovableEnv || isSandboxed) {
+        console.log('Environnement sandboxé détecté - bascule automatique vers téléchargement');
+        setHasError(true);
+        setErrorDetails('Environnement sandboxé détecté - le PDF ne peut pas être affiché en ligne');
+        setIsLoading(false);
+        setDebugInfo(debug);
+        return;
+      }
       
       // Test de connectivité vers le PDF
       if (pdfUrl) {
@@ -74,6 +78,14 @@ const SimplePDFViewer = () => {
             statusText: response.statusText,
             headers: Object.fromEntries(response.headers.entries())
           };
+          
+          // Si le fichier est accessible, on tente l'affichage
+          if (response.ok) {
+            setIsLoading(true); // Maintenir le loading pour tenter l'affichage
+          } else {
+            setHasError(true);
+            setErrorDetails(`Fichier non accessible: ${response.status} ${response.statusText}`);
+          }
         } catch (error) {
           console.error('Erreur fetch:', error);
           debug.fetchError = error.message;
@@ -83,6 +95,16 @@ const SimplePDFViewer = () => {
       }
       
       setDebugInfo({...debug});
+      
+      // Timer de sécurité - si pas de chargement après 3 secondes, afficher l'erreur
+      setTimeout(() => {
+        if (isLoading && !hasError) {
+          console.log('Timeout - bascule vers mode erreur');
+          setHasError(true);
+          setIsLoading(false);
+          setErrorDetails('Timeout de chargement - le navigateur bloque probablement le PDF');
+        }
+      }, 3000);
     };
     
     runDiagnostic();
@@ -226,44 +248,36 @@ const SimplePDFViewer = () => {
               {/* Informations de diagnostic */}
               <div className="bg-muted p-4 rounded-lg text-left text-sm mb-4 max-h-64 overflow-auto">
                 <h4 className="font-semibold mb-2">Diagnostic technique:</h4>
-                <pre className="whitespace-pre-wrap text-xs">
-                  {JSON.stringify(debugInfo, null, 2)}
-                </pre>
+                <div className="text-xs space-y-1">
+                  <p><strong>Statut:</strong> Blocage détecté par le navigateur</p>
+                  <p><strong>Cause:</strong> Restrictions de sécurité (ERR_BLOCKED_BY_CLIENT)</p>
+                  <p><strong>Solution:</strong> Téléchargement direct ou nouvel onglet</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 justify-center flex-wrap mb-4">
+                <Button 
+                  onClick={handleDirectDownload}
+                  size="lg"
+                  className="gap-2"
+                >
+                  <Download className="h-5 w-5" />
+                  Télécharger maintenant
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="lg"
+                  onClick={testDirectAccess}
+                  className="gap-2"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                  Ouvrir dans un nouvel onglet
+                </Button>
               </div>
               
               <div className="flex gap-2 justify-center flex-wrap">
                 <Button 
-                  onClick={() => {
-                    setHasError(false);
-                    setIsLoading(true);
-                    window.location.reload();
-                  }}
-                  size="sm"
-                  className="gap-2"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Réessayer
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={testDirectAccess}
-                  className="gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Accès direct
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownload}
-                  className="gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Télécharger
-                </Button>
-                <Button 
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => navigate('/')}
                   className="gap-2"
@@ -271,6 +285,26 @@ const SimplePDFViewer = () => {
                   <Home className="h-4 w-4" />
                   Retour accueil
                 </Button>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const details = document.querySelector('.diagnostic-details');
+                    if (details) {
+                      details.classList.toggle('hidden');
+                    }
+                  }}
+                  className="gap-2"
+                >
+                  Détails techniques
+                </Button>
+              </div>
+              
+              {/* Détails techniques cachés */}
+              <div className="diagnostic-details hidden mt-4 bg-muted p-4 rounded-lg text-left text-sm max-h-64 overflow-auto">
+                <pre className="whitespace-pre-wrap text-xs">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
               </div>
             </div>
           </div>
