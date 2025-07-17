@@ -250,13 +250,13 @@ const SimplePDFViewer = () => {
         {/* Visionneuse PDF avec iframe */}
         {!hasError && (
           <iframe
-            src={pdfUrl}
+            src={`${pdfUrl}#view=FitH`}
             className="w-full h-full border-0"
             title={title}
             onLoad={handleLoad}
             onError={handleError}
             style={{ minHeight: 'calc(100vh - 80px)' }}
-            sandbox="allow-same-origin allow-scripts"
+            allow="autoplay"
           />
         )}
       </div>
