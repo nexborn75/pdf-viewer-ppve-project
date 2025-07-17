@@ -37,7 +37,7 @@ const SimplePDFViewer = () => {
       console.log('User Agent:', navigator.userAgent);
       console.log('Location:', window.location.href);
       
-      const debug = {
+      const debug: any = {
         filename,
         pdfDoc,
         pdfUrl,
